@@ -1,11 +1,9 @@
-import { REST, Routes } from "discord.js";
+import { REST, Routes, SlashCommandBuilder } from "discord.js";
 import { token, client_id, guild_id } from "../config.json";
 
 import handler from "./raffle";
 
-const commands = [ handler.data ].map(x => x.toJSON())
-
-// Construct and prepare an instance of the REST module
+const commands: SlashCommandBuilder[] = [handler.data];
 const rest = new REST().setToken(token);
 
 // and deploy your commands!

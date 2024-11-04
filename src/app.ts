@@ -17,21 +17,15 @@ client.on(Events.InteractionCreate, async interaction => {
 
         await interaction.deferReply();
 
-        const command = interaction.command;
-        if (!command) {
-          // somethinf went really wrong
-          return;
-        }
-
         const guild = interaction.guild;
         if (!guild) {
-          // no commands in DMs
+          await interaction.followUp("Please only use commands in guilds!");
           return;
         }
 
         const user = guild.members.cache.get(interaction.user.id);
         if (!user) {
-          // somehow they're in a guild but not
+          await interaction.followUp("Somehow you're not apart of this guild?");
           return;
         }
 
