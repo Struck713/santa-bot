@@ -1,7 +1,5 @@
-import type { CacheType, ChatInputCommandInteraction, Client, GuildMember, SlashCommandBuilder } from "discord.js";
-
-type CommandInteraction = ChatInputCommandInteraction<CacheType>;
+import type { Client, GuildMember, SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 export interface Command {
-  execute: (client: Client, user: GuildMember, interaction: CommandInteraction) => Promise<void>,
+  execute: (client: Client, user: GuildMember, interaction: ChatInputCommandInteraction) => Promise<void>,
   data: SlashCommandBuilder
 }
