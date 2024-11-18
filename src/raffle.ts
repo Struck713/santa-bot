@@ -1,3 +1,5 @@
+// Fat
+
 import { ChatInputCommandInteraction, Emoji, parseEmoji, SlashCommandBuilder,TextChannel,type CacheType,type Client, type CommandInteraction, type GuildMember, type Interaction, type PartialUser, type User } from "discord.js";
 import type { Command } from "./command";
 import * as Utils from "./utils";
@@ -15,6 +17,7 @@ class Raffle {
   get id() { return this.messageId };
   isCreator = (user: GuildMember) => this.creator === user.id;
 
+  show = () => this.snowflakes.map(s => `<@!${s}>`).join(", ");
   join = (user: User | PartialUser) => this.snowflakes.push(user.id);
   leave = (user: User | PartialUser) => {
     const toRemove = this.snowflakes.findIndex(val => val === user.id);
@@ -27,7 +30,7 @@ class Raffle {
     const ids = [...this.snowflakes]; // clone
 
     for (const id of this.snowflakes) {
-      const [ assigneeId, assigneeIndex ] = Utils.random(ids);
+      const [ assigneeId, assigneeIndex ] = Utils.random(ids, [ id ]);
       const user = await Utils.getUserByID(client, id);
       const assignee = await Utils.getUserByID(client, assigneeId);
       ids.splice(assigneeIndex, 1);
@@ -46,10 +49,22 @@ export default <Command>{
   data: new SlashCommandBuilder().setName("raffle")
       .setDescription("Create and manage a raffle.")
       .addSubcommand(x => x.setName("create").setDescription("Create a raffle."))
-      .addSubcommand(x => x.setName("draw").setDescription("End the raffle and draw.")),
+      .addSubcommand(x => x.setName("draw").setDescription("End the raffle and draw."))
+      .addSubcommand(x => x.setName("show").setDescription("Show users in the raffle.")),
   execute: async (client: Client, user: GuildMember, interaction: ChatInputCommandInteraction) => {
     const options = interaction.options;
     const subcommand = options.getSubcommand();
+
+    if (subcommand == "show") {
+      const raffle = hasCreatedRaffle(user);
+      if (!raffle) {
+        await interaction.followUp("You need to create a raffle to show!");
+        return;
+      }
+
+      await interaction.followUp(`Currently in this raffle: ${raffle.show()}`);
+      return;
+    }
 
     if (subcommand == "draw") {
       const raffle = hasCreatedRaffle(user);
